@@ -1,6 +1,5 @@
 package com.example.modid;
 
-import com.example.modid.ExampleMod.Constants;
 import com.example.modid.proxy.CommonProxy;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -12,14 +11,15 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = Constants.MOD_ID, name = Constants.MOD_NAME, version = Constants.VERSION)
+@Mod(modid = Tags.MOD_ID, name = Tags.MOD_NAME, version = Tags.VERSION, dependencies = Tags.DEPENDENCIES)
 public class ExampleMod {
 
-    public static final Logger LOGGER = LogManager.getLogger(Constants.MOD_NAME);
+    public static final Logger LOGGER = LogManager.getLogger(Tags.MOD_NAME);
 
     @SidedProxy(
-            clientSide = "com.example.modid.proxy.ClientProxy",
-            serverSide = "com.example.modid.proxy.CommonProxy"
+            modId = Tags.MOD_ID,
+            clientSide = Tags.ROOT_PACKAGE + "." + Tags.MOD_ID + ".proxy.ClientProxy",
+            serverSide = Tags.ROOT_PACKAGE + "." + Tags.MOD_ID + ".proxy.CommonProxy"
     )
     public static CommonProxy proxy;
 
@@ -39,11 +39,5 @@ public class ExampleMod {
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         proxy.postInit(event);
-    }
-
-    public static class Constants {
-        public static final String MOD_ID = "modid";
-        public static final String MOD_NAME = "Mod Name";
-        public static final String VERSION = "1.0";
     }
 }
