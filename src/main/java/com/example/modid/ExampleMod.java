@@ -18,8 +18,8 @@ public class ExampleMod {
 
     @SidedProxy(
             modId = Tags.MOD_ID,
-            clientSide = Tags.ROOT_PACKAGE + "." + Tags.MOD_ID + ".proxy.ClientProxy",
-            serverSide = Tags.ROOT_PACKAGE + "." + Tags.MOD_ID + ".proxy.CommonProxy"
+            clientSide = Tags.CLIENT_PROXY_PATH,
+            serverSide = Tags.SERVER_PROXY_PATH
     )
     public static CommonProxy proxy;
 
