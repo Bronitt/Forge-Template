@@ -311,7 +311,7 @@ tasks.withType(JavaCompile).configureEach {
         options.release.set(8)
         javaCompiler.set(javaToolchains.compilerFor {
             languageVersion.set(JavaLanguageVersion.of(16))
-            vendor.set(JvmVendorSpec.AZUL)
+            vendor.set(JvmVendorSpec.ADOPTIUM)
         })
     }
 }
