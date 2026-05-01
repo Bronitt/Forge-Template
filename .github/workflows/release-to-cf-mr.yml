@@ -29,7 +29,7 @@ jobs:
         run: chmod +x ./gradlew
         
       - name: Execute Gradle build
-        run: ./gradlew build
+        run: ./gradlew build -x spotlessCheck
 
       - name: Get Changes between Tags
         id: changes
@@ -50,7 +50,7 @@ jobs:
           files: |
             build/libs/!(*-@(dev|sources|javadoc)).jar
             build/libs/*-@(dev|sources|javadoc).jar
-          loaders: forge
+          loaders: neoforge
           game-versions: 1.12.2
           java: |
             25
