@@ -23,6 +23,7 @@ assertProperty 'mod_version'
 assertProperty 'root_package'
 assertProperty 'mod_id'
 assertProperty 'mod_name'
+assertProperty 'archives_name'
 
 assertSubProperties 'use_tags', 'tag_class_name'
 assertSubProperties 'use_access_transformer', 'access_transformer_locations'
@@ -40,18 +41,12 @@ setDefaultProperty 'minecraft_username', true, 'Developer'
 setDefaultProperty 'extra_jvm_args', false, ''
 setDefaultProperty 'extra_tweak_classes', false, ''
 setDefaultProperty 'change_minecraft_sources', false, false
-setDefaultProperty 'use_mod_name_as_archives_name', true, false
 
 version = propertyString('mod_version')
 group = propertyString('root_package')
 
 base {
-    if (propertyBool('use_mod_name_as_archives_name')) {
-        archivesName.set(propertyString('mod_name'))
-    } else {
-        archivesName.set(propertyString('mod_id'))
-    }
-
+    archivesName.set(propertyString('archives_name'))
 }
 
 tasks.decompressDecompiledSources.enabled !propertyBool('change_minecraft_sources')
