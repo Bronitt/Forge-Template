@@ -23,6 +23,10 @@ base {
     archivesName = mod_id
 }
 
+scala {
+    scalaVersion = '3.8.4'
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
