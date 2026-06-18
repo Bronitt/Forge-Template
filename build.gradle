@@ -1,14 +1,15 @@
+import org.jetbrains.gradle.ext.Gradle
+
 plugins {
     id 'java'
     id 'java-library'
     id 'maven-publish'
-    id 'com.gradleup.shadow' version '9.4.1'
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
     id 'xyz.wagyourtail.unimined' version '1.4.23-kappa'
     id 'net.kyori.blossom' version '2.2.0'
+    id 'com.gradleup.shadow' version '9.4.2'
+    id 'com.diffplug.spotless' version '8.6.0'
 }
-
-import org.jetbrains.gradle.ext.Gradle
 
 apply from: 'gradle/scripts/helpers.gradle'
 
@@ -34,7 +35,6 @@ base {
     archivesName = propertyString('mod_id')
 }
 
-
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
@@ -50,6 +50,8 @@ java {
 configurations {
     contain
     implementation.extendsFrom(contain)
+    shaded
+    implementation.extendsFrom(shaded)
     modCompileOnly
     compileOnly.extendsFrom(modCompileOnly)
     modRuntimeOnly
@@ -105,9 +107,10 @@ dependencies {
         implementation "com.cleanroommc:assetmover:${propertyString('asset_mover_version')}"
     }
     if (propertyBool('enable_junit_testing')) {
-        testImplementation 'org.junit.jupiter:junit-jupiter:6.0.3'
+        testImplementation 'org.junit.jupiter:junit-jupiter:6.1.0'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     }
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
 apply from: 'gradle/scripts/dependencies.gradle'
@@ -132,45 +135,17 @@ sourceSets {
                 property('mod_description', propertyString('mod_description'))
                 property('mod_authors', propertyStringList('mod_authors', ',').collect {it.strip()}.join('", "'))
                 property('mod_credits', propertyString('mod_credits'))
+                property('mod_license', propertyString('mod_license'))
                 property('mod_url', propertyString('mod_url'))
+                property('mod_issue_tracker_url', propertyString('mod_issue_tracker_url'))
                 property('mod_update_json', propertyString('mod_update_json'))
+                property('mod_icon_item', propertyString('mod_icon_item'))
                 property('mod_logo_path', propertyString('mod_logo_path'))
+                property('mod_icon_path', propertyString('mod_icon_path'))
+                property('mod_background_path', propertyString('mod_background_path'))
             }
         }
     }
-}
-
-idea {
-    module {
-        inheritOutputDirs = true
-    }
-    project {
-        settings {
-            runConfigurations {
-                '1. Build'(Gradle) {
-                    taskNames = ["build"]
-                }
-                '2. Run Client'(Gradle) {
-                    taskNames = ["runClient"]
-                }
-                '3. Run Server'(Gradle) {
-                    taskNames = ["runServer"]
-                }
-            }
-            compiler.javac {
-                afterEvaluate {
-                    javacAdditionalOptions = '-encoding utf8'
-                    moduleJavacAdditionalOptions = [
-                            (project.name + '.main'): tasks.compileJava.options.compilerArgs.collect { '"' + it + '"' }.join(' ')
-                    ]
-                }
-            }
-        }
-    }
-}
-
-if (!propertyBool('enable_shadow')) {
-    shadowJar.enabled = false
 }
 
 compileJava {
@@ -208,13 +183,24 @@ jar {
     finalizedBy(tasks.named(remapTaskName).get())
 }
 
-
+// Shade deps to the dev jar, so the normal dev jar will contain deps
 shadowJar {
     //noinspection GroovyAssignabilityCheck,GroovyAccessibility
-    configurations = [project.configurations.shadow]
-    archiveClassifier = "shadow"
+    archiveClassifier = 'dev'
+    configurations = [ project.configurations.shaded ]
 }
 
+if (propertyBool('enable_shadow')) {
+    // Unshaded dev jar get 'plain' as name
+    tasks.named("jar").configure {
+        finalizedBy shadowJar
+        archiveClassifier = "plain"
+    }
+} else {
+    tasks.named('shadowJar').configure {
+        enabled = false
+    }
+}
 
 tasks.named(remapTaskName).configure {
     doFirst {
@@ -225,8 +211,40 @@ tasks.named(remapTaskName).configure {
     }
 }
 
+idea {
+    module {
+        inheritOutputDirs = true
+    }
+    project {
+        settings {
+            runConfigurations {
+                "0. Apply Spotless"(Gradle) {
+                    taskNames = ["spotlessApply"]
+                }
+                "1. Run Client"(Gradle) {
+                    taskNames = ["runClient"]
+                }
+                "2. Run Server"(Gradle) {
+                    taskNames = ["runServer"]
+                }
+                "3. Build Mod"(Gradle) {
+                    taskNames = ["build"]
+                }
+            }
+            compiler.javac {
+                afterEvaluate {
+                    javacAdditionalOptions = "-encoding utf8"
+                    moduleJavacAdditionalOptions = [
+                            (project.name + ".main"): tasks.compileJava.options.compilerArgs.collect { '"' + it + '"' }.join(' ')
+                    ]
+                }
+            }
+        }
+    }
+}
+
 compileTestJava {
-    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_25
 }
 
 test {
