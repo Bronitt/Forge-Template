@@ -185,8 +185,8 @@ jar {
 
 // Shade deps to the dev jar, so the normal dev jar will contain deps
 shadowJar {
-    //noinspection GroovyAssignabilityCheck,GroovyAccessibility
     archiveClassifier = 'dev'
+    //noinspection GroovyAssignabilityCheck,GroovyAccessibility
     configurations = [ project.configurations.shaded ]
 }
 
