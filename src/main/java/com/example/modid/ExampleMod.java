@@ -1,18 +1,18 @@
 package com.example.modid;
 
 import com.example.modid.proxy.CommonProxy;
+import com.example.modid.util.LogUtil;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Mod(modid = Tags.MOD_ID, name = Tags.MOD_NAME, version = Tags.VERSION, dependencies = Tags.DEPENDENCIES)
 public class ExampleMod {
 
-    public static final Logger LOGGER = LogManager.getLogger(Tags.MOD_NAME);
+    public static final Logger LOGGER = LogUtil.getModLogger();
 
     @SidedProxy(
             modId = Tags.MOD_ID,
