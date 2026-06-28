@@ -1,0 +1,34 @@
+package com.example.modid.util;
+
+import com.example.modid.Tags;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class LogUtil {
+
+    public static Logger getLogger(Class<?> clazz) {
+        return getLogger(clazz.getSimpleName());
+    }
+
+    public static Logger getLogger(Class<?> clazz, String name) {
+        return getLogger(clazz.getSimpleName(), name);
+    }
+
+    public static Logger getLogger(Class<?> clazz, Class<?> clazz2) {
+        return getLogger(clazz.getSimpleName(), clazz2.getSimpleName());
+    }
+
+    public static Logger getLogger(String name, String name2) {
+        return getLogger(name + "/" +  name2);
+    }
+
+    public static Logger getLogger(String name) {
+        return LogManager.getLogger(Tags.MOD_NAME + "/" + name);
+    }
+
+    public static Logger getModLogger() {
+        return LogManager.getLogger(Tags.MOD_NAME);
+    }
+
+
+}

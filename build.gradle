@@ -9,11 +9,12 @@ plugins {
     id 'java'
     id 'java-library'
     id 'maven-publish'
-    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.3'
+    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
     id 'com.gtnewhorizons.retrofuturagradle' version '2.0.2'
     id 'com.matthewprenger.cursegradle' version '1.4.0' apply false
     id 'com.modrinth.minotaur' version '2.+' apply false
     id 'org.jetbrains.changelog' version '2.5.0'
+    id 'com.gradleup.shadow' version '9.4.+'
 }
 
 apply from: 'gradle/scripts/helpers.gradle'
@@ -23,6 +24,7 @@ assertProperty 'mod_version'
 assertProperty 'root_package'
 assertProperty 'mod_id'
 assertProperty 'mod_name'
+assertProperty 'archives_name'
 
 assertSubProperties 'use_tags', 'tag_class_name'
 assertSubProperties 'use_access_transformer', 'access_transformer_locations'
@@ -31,6 +33,8 @@ assertSubProperties 'is_coremod', 'coremod_includes_mod', 'coremod_plugin_class_
 assertSubProperties 'use_asset_mover', 'asset_mover_version'
 
 setDefaultProperty 'use_modern_java_syntax', false, false
+setDefaultProperty 'use_jetbrains_annotations', false, true
+setDefaultProperty 'jetbrains_annotations_version', false, '26.1.0'
 setDefaultProperty 'generate_sources_jar', true, false
 setDefaultProperty 'generate_javadocs_jar', true, false
 setDefaultProperty 'mapping_channel', true, 'stable'
@@ -45,10 +49,10 @@ version = propertyString('mod_version')
 group = propertyString('root_package')
 
 base {
-    archivesName.set(propertyString('mod_id'))
+    archivesName.set(propertyString('archives_name'))
 }
 
-tasks.decompressDecompiledSources.enabled !propertyBool('change_minecraft_sources')
+tasks.decompressDecompiledSources.enabled !propertyBool('change_minecraft_sources') || !layout.buildDirectory.dir('rfg/minecraft-src').get().asFile.exists()
 
 java {
     toolchain {
@@ -62,11 +66,6 @@ java {
     if (propertyBool('generate_javadocs_jar')) {
         withJavadocJar()
     }
-}
-
-configurations {
-    embed
-    implementation.extendsFrom(embed)
 }
 
 minecraft {
@@ -124,6 +123,9 @@ dependencies {
         testCompileOnly('com.github.bsideup.jabel:jabel-javac-plugin:1.0.0') {
             transitive = false // We only care about the 1 annotation class
         }
+    }
+    if (propertyBool('use_jetbrains_annotations')) {
+        compileOnly "org.jetbrains:annotations:${propertyString('jetbrains_annotations_version')}"
     }
     if (propertyBool('use_asset_mover')) {
         implementation "com.cleanroommc:assetmover:${propertyString('asset_mover_version')}"
@@ -219,8 +221,6 @@ jar {
         }
         attributes(attribute_map)
     }
-    // Add all embedded dependencies into the jar
-    from(provider{ configurations.embed.collect {it.isDirectory() ? it : zipTree(it)} })
 }
 
 idea {
