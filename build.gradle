@@ -1,7 +1,6 @@
 /**
  * It is advised that you do not edit anything in the build.gradle; unless you are sure of what you are doing
  */
-import com.gtnewhorizons.retrofuturagradle.mcp.InjectTagsTask
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.gradle.ext.Gradle
 
@@ -11,6 +10,7 @@ plugins {
     id 'maven-publish'
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
     id 'com.gtnewhorizons.retrofuturagradle' version '2.0.2'
+    id 'net.kyori.blossom' version '2.2.0'
     id 'com.matthewprenger.cursegradle' version '1.4.0' apply false
     id 'com.modrinth.minotaur' version '2.+' apply false
     id 'org.jetbrains.changelog' version '2.5.0'
@@ -23,11 +23,10 @@ apply from: 'gradle/scripts/helpers.gradle'
 assertProperty 'mod_version'
 assertProperty 'root_package'
 assertProperty 'mod_id'
-assertProperty 'mod_name'
-assertProperty 'archives_name'
 assertProperty 'mod_package'
+assertProperty 'mod_name'
+assertProperty 'archive_name'
 
-assertSubProperties 'use_tags', 'tag_class_name'
 assertSubProperties 'use_access_transformer', 'access_transformer_locations'
 assertSubProperties 'use_mixins', 'mixin_booter_version', 'mixin_refmap'
 assertSubProperties 'is_coremod', 'coremod_includes_mod', 'coremod_plugin_class_name'
@@ -50,7 +49,7 @@ version = propertyString('mod_version')
 group = propertyString('root_package')
 
 base {
-    archivesName.set(propertyString('archives_name'))
+    archivesName.set(propertyString('archive_name'))
 }
 
 tasks.decompressDecompiledSources.enabled !propertyBool('change_minecraft_sources') || !layout.buildDirectory.dir('rfg/minecraft-src').get().asFile.exists()
@@ -91,15 +90,6 @@ minecraft {
     }
     extraRunJvmArguments.addAll(args)
     extraRunJvmArguments.addAll(propertyStringList('extra_jvm_args'))
-
-    if (propertyBool('use_tags')) {
-        if (file('tags.properties').exists()) {
-            Properties props = new Properties().tap {  it.load(file('tags.properties').newInputStream()); it }
-            if (!props.isEmpty()) {
-                injectedTags.set(props.collectEntries { k, v -> [(k): interpolate(v)] })
-            }
-        }
-    }
 }
 
 repositories {
@@ -168,43 +158,33 @@ if (propertyBool('use_access_transformer')) {
 }
 
 processResources {
-
-    inputs.property 'mod_id', propertyString('mod_id')
-    inputs.property 'mod_name', propertyString('mod_name')
-    inputs.property 'mod_version', propertyString('mod_version')
-    inputs.property 'mod_description', propertyString('mod_description')
-    inputs.property 'mod_authors', "${propertyStringList('mod_authors', ',').join(', ')}"
-    inputs.property 'mod_credits', propertyString('mod_credits')
-    inputs.property 'mod_url', propertyString('mod_url')
-    inputs.property 'mod_update_json', propertyString('mod_update_json')
-    inputs.property 'mod_logo_path', propertyString('mod_logo_path')
-    inputs.property 'mixin_refmap', propertyString('mixin_refmap')
-    inputs.property 'mixin_package', propertyString('mixin_package')
-    inputs.property 'mixin_configs', propertyStringList('mixin_configs').join(' ')
-
-    def filterList = ['mcmod.info', 'pack.mcmeta']
-    filterList.addAll(propertyStringList('mixin_configs').collect(config -> "mixins.${config}.json" as String))
-
-    filesMatching(filterList) { fcd ->
-        fcd.expand(
-                'mod_id': propertyString('mod_id'),
-                'mod_name': propertyString('mod_name'),
-                'mod_version': propertyString('mod_version'),
-                'mod_description': propertyString('mod_description'),
-                'mod_authors': "${propertyStringList('mod_authors', ',').join(', ')}",
-                'mod_credits': propertyString('mod_credits'),
-                'mod_url': propertyString('mod_url'),
-                'mod_update_json': propertyString('mod_update_json'),
-                'mod_logo_path': propertyString('mod_logo_path'),
-                'mixin_refmap': propertyString('mixin_refmap'),
-                'mixin_package': propertyString('mixin_package')
-        )
-    }
-    
     if (propertyBool('use_access_transformer')) {
         rename '(.+_at.cfg)', 'META-INF/$1'
     }
+}
 
+sourceSets {
+    main {
+        blossom {
+            javaSources {
+                property('mod_id', propertyString('mod_id'))
+                property('mod_name', propertyString('mod_name'))
+                property('mod_version', propertyString('mod_version'))
+                property('package', propertyString('mod_package'))
+            }
+            resources {
+                property('mod_id', propertyString('mod_id'))
+                property('mod_name', propertyString('mod_name'))
+                property('mod_version', propertyString('mod_version'))
+                property('mod_description', propertyString('mod_description'))
+                property('mod_authors', propertyStringList('mod_authors', ',').collect {it.strip()}.join('", "'))
+                property('mod_credits', propertyString('mod_credits'))
+                property('mod_url', propertyString('mod_url'))
+                property('mod_update_json', propertyString('mod_update_json'))
+                property('mod_logo_path', propertyString('mod_logo_path'))
+            }
+        }
+    }
 }
 
 jar {
@@ -237,16 +217,19 @@ idea {
                 "0. Setup Decomp Workspace"(Gradle) {
                     taskNames = ["setupDecompWorkspace"]
                 }
-                "1. Run Client"(Gradle) {
+                "1. Build Mod"(Gradle) {
+                    taskNames = ["build"]
+                }
+                "2. Run Client"(Gradle) {
                     taskNames = ["runClient"]
                 }
-                "2. Run Server"(Gradle) {
+                "3. Run Server"(Gradle) {
                     taskNames = ["runServer"]
                 }
-                "3. Run Obfuscated Client"(Gradle) {
+                "4. Run Obfuscated Client"(Gradle) {
                     taskNames = ["runObfClient"]
                 }
-                "4. Run Obfuscated Server"(Gradle) {
+                "5. Run Obfuscated Server"(Gradle) {
                     taskNames = ["runObfServer"]
                 }
             }
@@ -292,7 +275,6 @@ String parserChangelog() {
 }
 
 tasks.register('generateMixinJson') {
-    group 'cleanroom helpers'
     def missingConfig = propertyStringList('mixin_configs').findAll(config -> !file("src/main/resources/mixins.${config}.json").exists())
     onlyIf {
         if (propertyBool('use_mixins') && propertyBool('generate_mixins_json')) {
@@ -323,22 +305,10 @@ tasks.withType(JavaCompile).configureEach {
     }
 }
 
-tasks.register('cleanroomAfterSync') {
-    group 'cleanroom helpers'
-    dependsOn 'injectTags', 'generateMixinJson'
-}
-
 if (propertyBool('use_modern_java_syntax')) {
     tasks.withType(Javadoc).configureEach {
         sourceCompatibility = 17
     }
-}
-
-tasks.named('injectTags', InjectTagsTask).configure {
-    onlyIf {
-        return propertyBool('use_tags') && !it.getTags().get().isEmpty()
-    }
-    it.outputClassName.set(propertyString('tag_class_name'))
 }
 
 tasks.named('prepareObfModsFolder').configure {
@@ -358,7 +328,7 @@ tasks.register('prioritizeCoremods') {
 
 idea.project.settings {
     taskTriggers {
-        afterSync 'cleanroomAfterSync'
+        afterSync 'generateMixinJson'
     }
 }
 

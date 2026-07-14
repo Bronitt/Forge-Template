@@ -9,15 +9,15 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = Tags.MOD_ID, name = Tags.MOD_NAME, version = Tags.VERSION, dependencies = Tags.DEPENDENCIES)
+@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, dependencies = Reference.DEPENDENCIES)
 public class ExampleMod {
 
     public static final Logger LOGGER = LogUtil.getModLogger();
 
     @SidedProxy(
-            modId = Tags.MOD_ID,
-            clientSide = Tags.CLIENT_PROXY_PATH,
-            serverSide = Tags.SERVER_PROXY_PATH
+            modId = Reference.MOD_ID,
+            clientSide = Reference.CLIENT_PROXY_CLASS,
+            serverSide = Reference.SERVER_PROXY_CLASS
     )
     public static CommonProxy proxy;
 
