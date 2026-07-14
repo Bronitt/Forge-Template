@@ -6,36 +6,24 @@ repositories {
     }
     // Other repositories described by default:
     // CleanroomMC: https://maven.cleanroommc.com
-    exclusiveContent {
-        forRepository {
-            maven {
-                name 'CurseMaven'
-                url 'https://cursemaven.com'
-            }
-        }
-        filter {
+    maven {
+        name 'CurseMaven'
+        url 'https://cursemaven.com'
+        content {
             includeGroup 'curse.maven'
         }
     }
-    exclusiveContent {
-        forRepository {
-            maven {
-                name 'CleanroomMC CurseMaven'
-                url 'https://curse.cleanroommc.com'
-            }
-        }
-        filter {
+    maven {
+        name 'CleanroomCurseMaven'
+        url 'https://curse.cleanroommc.com'
+        content {
             includeGroup 'curse.maven'
         }
     }
-    exclusiveContent {
-        forRepository {
-            maven {
-                name 'Modrinth'
-                url 'https://api.modrinth.com/maven'
-            }
-        }
-        filter {
+    maven {
+        name 'Modrinth'
+        url 'https://api.modrinth.com/maven'
+        content {
             includeGroup 'maven.modrinth'
         }
     }
