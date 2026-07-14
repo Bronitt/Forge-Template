@@ -1,6 +1,9 @@
 apply from: 'gradle/scripts/helpers.gradle'
 
 repositories {
+    flatDir {
+        dirs('libs', 'dev')
+    }
     // Other repositories described by default:
     // CleanroomMC: https://maven.cleanroommc.com
     exclusiveContent {
@@ -36,6 +39,7 @@ repositories {
             includeGroup 'maven.modrinth'
         }
     }
+    mavenCentral()
     mavenLocal() // Must be last for caching to work
 }
 
@@ -67,6 +71,9 @@ dependencies {
     // 'maven.modrinth:jei:4.16.1.1000' << jei = project name, 4.16.1.1000 = file version
     // Full documentation: https://docs.modrinth.com/docs/tutorials/maven/
 
+    // Example - Local dependencies:
+    // 'libs:ctm-1.2.1; << libs = folder name (/libs) in flatDir, ctm-1.2.1 = file name (ctm-1.2.1.jar)
+
     // Common dependency types (configuration):
     // implementation = dependency available at both compile time and runtime
     // runtimeOnly = runtime dependency
@@ -82,7 +89,7 @@ dependencies {
     //     transitive = false
     // }
 
-    runtimeOnly files("dev/devtools-1.0.1.jar")
+    runtimeOnly "dev:devtools-1.0.1.jar"
 }
 
 if (propertyBool('enable_shadow')) {
