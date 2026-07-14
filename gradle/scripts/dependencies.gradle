@@ -89,7 +89,7 @@ dependencies {
     //     transitive = false
     // }
 
-    runtimeOnly "dev:devtools-1.0.1.jar"
+    runtimeOnly "dev:devtools-1.0.1"
 }
 
 if (propertyBool('enable_shadow')) {
