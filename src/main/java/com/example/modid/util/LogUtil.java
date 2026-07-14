@@ -1,6 +1,6 @@
 package com.example.modid.util;
 
-import com.example.modid.Tags;
+import com.example.modid.Reference;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,11 +23,11 @@ public class LogUtil {
     }
 
     public static Logger getLogger(String name) {
-        return LogManager.getLogger(Tags.MOD_NAME + "/" + name);
+        return LogManager.getLogger(Reference.MOD_NAME + "/" + name);
     }
 
     public static Logger getModLogger() {
-        return LogManager.getLogger(Tags.MOD_NAME);
+        return LogManager.getLogger(Reference.MOD_NAME);
     }
 
 
