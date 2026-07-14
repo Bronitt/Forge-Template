@@ -2,7 +2,7 @@ apply from: 'gradle/scripts/helpers.gradle'
 
 repositories {
     flatDir {
-        dirs('libs') // /libs
+        dirs('libs', 'dev')
     }
     // Other repositories described by default:
     // CleanroomMC: https://maven.cleanroommc.com
@@ -74,6 +74,8 @@ dependencies {
     // implementation ('com.google.code.gson:gson:2.8.6') {
     //     transitive = false
     // }
+
+    runtimeOnly "dev:devtools-1.0.1"
 }
 
 if (propertyBool('enable_shadow')) {
