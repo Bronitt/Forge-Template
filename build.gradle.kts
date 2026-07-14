@@ -1,6 +1,7 @@
 import org.jetbrains.gradle.ext.Gradle
 import org.jetbrains.gradle.ext.compiler
 import org.jetbrains.gradle.ext.runConfigurations
+import org.jetbrains.gradle.ext.taskTriggers
 import org.jetbrains.gradle.ext.settings
 
 plugins {
@@ -8,9 +9,9 @@ plugins {
     `java-library`
     `maven-publish`
     kotlin("jvm") version "2.4.0"
-    id("com.gradleup.shadow") version "9.4.1"
+    id("com.gradleup.shadow") version "9.5.1"
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.4.1"
-    id("xyz.wagyourtail.unimined") version "1.4.23-kappa"
+    id("xyz.wagyourtail.unimined") version "1.4.26-kappa"
     id("net.kyori.blossom") version "2.2.0"
 }
 
@@ -112,7 +113,7 @@ unimined.minecraft {
         if (useAccessTransformer) {
             accessTransformer("${rootProject.projectDir}/src/main/resources/$access_transformer_locations")
         }
-        loader("0.5.14-alpha")
+        loader("0.5.17-alpha")
         runs.all {
             args.addAll(listOf("--username", minecraft_username))
             if (extra_jvm_args.isNotEmpty()) {
@@ -217,6 +218,9 @@ idea {
                 afterEvaluate {
                     javacAdditionalOptions = "-encoding utf8"
                 }
+            }
+            taskTriggers {
+                afterSync(tasks.named("genSources"))
             }
         }
     }
