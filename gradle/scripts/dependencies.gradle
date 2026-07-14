@@ -6,6 +6,17 @@ repositories {
     exclusiveContent {
         forRepository {
             maven {
+                name 'CurseMaven'
+                url 'https://cursemaven.com'
+            }
+        }
+        filter {
+            includeGroup 'curse.maven'
+        }
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
                 name 'CleanroomMC CurseMaven'
                 url 'https://curse.cleanroommc.com'
             }
