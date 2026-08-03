@@ -1,6 +1,6 @@
 package com.example.modid.core;
 
-import com.example.modid.Tags;
+import com.example.modid.Reference;
 import com.google.common.eventbus.EventBus;
 import net.minecraftforge.fml.common.DummyModContainer;
 import net.minecraftforge.fml.common.LoadController;
@@ -11,12 +11,12 @@ public class ExampleModContainer extends DummyModContainer {
     public ExampleModContainer() {
         super(new ModMetadata());
         ModMetadata meta = this.getMetadata();
-        meta.modId = Tags.MOD_ID + "-core";
-        meta.name = Tags.MOD_NAME + " Core";
-        meta.version = Tags.VERSION;
+        meta.modId = Reference.MOD_ID + "-core";
+        meta.name = Reference.MOD_NAME + " Core";
+        meta.version = Reference.VERSION;
         meta.authorList.add("QSTeam");
         meta.authorList.add("Bron1t");
-        meta.description = "Core mod for " + Tags.MOD_NAME;
+        meta.description = "Core mod for " + Reference.MOD_NAME;
     }
 
     @SuppressWarnings("all")
