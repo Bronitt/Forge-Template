@@ -7,7 +7,7 @@ spotless {
     enforceCheck false
 
     java {
-        def packagePath = "${propertyString('mod_package')}".replace('.', '/')
+        def packagePath = "${propertyString('root_package') + '/' + propertyString('mod_id')}".replace('.', '/')
         target fileTree('src') {
             include "*/java/${packagePath}/**/*.java"
         }

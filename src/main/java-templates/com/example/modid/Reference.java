@@ -1,4 +1,4 @@
-package {{ package }};
+package {{ root_package }}.{{ mod_id }};
 
 /**
  * Tags storage class, you can change at will
@@ -11,8 +11,7 @@ public final class Reference {
     public static final String MOD_NAME = "{{ mod_name }}";
     public static final String VERSION = "{{ mod_version }}";
     public static final String DEPENDENCIES = "";
-    public static final String MOD_PACKAGE = "{{ package }}";
-    public static final String CLIENT_PROXY_CLASS = MOD_PACKAGE + ".proxy.ClientProxy";
-    public static final String SERVER_PROXY_CLASS = MOD_PACKAGE + ".proxy.CommonProxy";
+    public static final String CLIENT_PROXY_CLASS = "{{ root_package }}.{{ mod_id }}.proxy.ClientProxy";
+    public static final String SERVER_PROXY_CLASS = "{{ root_package }}.{{ mod_id }}.proxy.CommonProxy";
 
 }
